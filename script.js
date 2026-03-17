@@ -1,49 +1,49 @@
 /* ------------------------------------------------------------------ */
 /*  CONSTANTS & STATE                                                   */
 /* ------------------------------------------------------------------ */
-const ORG  = 'OWASP-BLT';
-const API  = 'https://api.github.com';
+const ORG = 'OWASP-BLT';
+const API = 'https://api.github.com';
 const PER_PAGE = 100;            // max allowed by GitHub API
 const MAX_LANGUAGES_DISPLAYED = 12; // sidebar language filter cap
 
 // Project board URLs sourced from https://github.com/OWASP-BLT/.github/blob/main/scripts/project_urls.json
 const PROJECT_URLS = {
-  'BLT':                          'https://github.com/orgs/OWASP-BLT/projects/2',
-  'BLT-Flutter':                  'https://github.com/orgs/OWASP-BLT/projects/60',
-  'BLT-Extension':                'https://github.com/orgs/OWASP-BLT/projects/59',
-  'BLT-Lettuce':                  'https://github.com/orgs/OWASP-BLT/projects/65',
-  'BLT-Sammich':                  'https://github.com/orgs/OWASP-BLT/projects/55',
-  'BLT-Github-Sportscaster':      'https://github.com/orgs/OWASP-BLT/projects/63',
-  'BLT-NetGuardian':              'https://github.com/orgs/OWASP-BLT/projects/81',
-  'BLT-Rewards':                  'https://github.com/orgs/OWASP-BLT/projects/70',
-  'BLT-Toasty':                   'https://github.com/orgs/OWASP-BLT/projects/54',
-  'BLT-Leaf':                     'https://github.com/orgs/OWASP-BLT/projects/83',
-  'BLT-Hackathons':               'https://github.com/orgs/OWASP-BLT/projects/47',
+  'BLT': 'https://github.com/orgs/OWASP-BLT/projects/2',
+  'BLT-Flutter': 'https://github.com/orgs/OWASP-BLT/projects/60',
+  'BLT-Extension': 'https://github.com/orgs/OWASP-BLT/projects/59',
+  'BLT-Lettuce': 'https://github.com/orgs/OWASP-BLT/projects/65',
+  'BLT-Sammich': 'https://github.com/orgs/OWASP-BLT/projects/55',
+  'BLT-Github-Sportscaster': 'https://github.com/orgs/OWASP-BLT/projects/63',
+  'BLT-NetGuardian': 'https://github.com/orgs/OWASP-BLT/projects/81',
+  'BLT-Rewards': 'https://github.com/orgs/OWASP-BLT/projects/70',
+  'BLT-Toasty': 'https://github.com/orgs/OWASP-BLT/projects/54',
+  'BLT-Leaf': 'https://github.com/orgs/OWASP-BLT/projects/83',
+  'BLT-Hackathons': 'https://github.com/orgs/OWASP-BLT/projects/47',
   'BLT-Personal-Privacy-Protection': 'https://github.com/orgs/OWASP-BLT/projects/73',
-  'BLT-Panini':                   'https://github.com/orgs/OWASP-BLT/projects/78',
-  'BLT-Sizzle':                   'https://github.com/orgs/OWASP-BLT/projects/76',
-  'BLT-API':                      'https://github.com/orgs/OWASP-BLT/projects/80',
-  'BLT-Newsletter':               'https://github.com/orgs/OWASP-BLT/projects/78',
+  'BLT-Panini': 'https://github.com/orgs/OWASP-BLT/projects/78',
+  'BLT-Sizzle': 'https://github.com/orgs/OWASP-BLT/projects/76',
+  'BLT-API': 'https://github.com/orgs/OWASP-BLT/projects/80',
+  'BLT-Newsletter': 'https://github.com/orgs/OWASP-BLT/projects/78',
 };
 
 const LANG_COLORS = {
-  Python:'#3572A5', JavaScript:'#f1e05a', TypeScript:'#2b7489', HTML:'#e34c26',
-  CSS:'#563d7c', Shell:'#89e051', Java:'#b07219', Go:'#00ADD8', Ruby:'#701516',
-  PHP:'#4F5D95', 'C++':'#f34b7d', C:'#555555', Rust:'#dea584', Kotlin:'#F18E33',
-  Swift:'#F05138', Dart:'#00B4AB', Vue:'#41b883', Dockerfile:'#384d54',
+  Python: '#3572A5', JavaScript: '#f1e05a', TypeScript: '#2b7489', HTML: '#e34c26',
+  CSS: '#563d7c', Shell: '#89e051', Java: '#b07219', Go: '#00ADD8', Ruby: '#701516',
+  PHP: '#4F5D95', 'C++': '#f34b7d', C: '#555555', Rust: '#dea584', Kotlin: '#F18E33',
+  Swift: '#F05138', Dart: '#00B4AB', Vue: '#41b883', Dockerfile: '#384d54',
 };
 
-let allRepos   = [];
-let filtered   = [];
-let currentSort   = localStorage.getItem('blt-sort') || 'updated_at';
+let allRepos = [];
+let filtered = [];
+let currentSort = localStorage.getItem('blt-sort') || 'updated_at';
 let currentFilter = 'all';
-let currentLang   = '';
+let currentLang = '';
 let currentSearch = '';
-let currentLabel  = '';
-let currentView   = localStorage.getItem('blt-view') || (window.innerWidth < 768 ? 'card' : 'table');
-let tableSortCol  = localStorage.getItem('blt-table-sort-col') || 'updated_at';
-let tableSortDir  = localStorage.getItem('blt-table-sort-dir') || 'desc';
-let allLabels     = [];
+let currentLabel = '';
+let currentView = localStorage.getItem('blt-view') || (window.innerWidth < 768 ? 'card' : 'table');
+let tableSortCol = localStorage.getItem('blt-table-sort-col') || 'updated_at';
+let tableSortDir = localStorage.getItem('blt-table-sort-dir') || 'desc';
+let allLabels = [];
 
 /* ------------------------------------------------------------------ */
 /*  DARK MODE                                                           */
@@ -86,9 +86,9 @@ function formatSize(kb) {
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const secs = Math.floor(diff / 1000);
-  if (secs < 60)   return 'just now';
+  if (secs < 60) return 'just now';
   if (secs < 3600) return Math.floor(secs / 60) + 'm ago';
-  if (secs < 86400)return Math.floor(secs / 3600) + 'h ago';
+  if (secs < 86400) return Math.floor(secs / 3600) + 'h ago';
   if (secs < 2592000) return Math.floor(secs / 86400) + 'd ago';
   if (secs < 31536000) return Math.floor(secs / 2592000) + 'mo ago';
   return Math.floor(secs / 31536000) + 'y ago';
@@ -141,10 +141,10 @@ function maturityScore(r) {
 }
 
 function maturityMeta(score) {
-  if (score >= 75) return { label: 'Mature',     color: 'text-green-700 dark:text-green-400',   bg: 'bg-green-50 dark:bg-green-900/30' };
-  if (score >= 50) return { label: 'Beta',       color: 'text-blue-700 dark:text-blue-400',     bg: 'bg-blue-50 dark:bg-blue-900/30' };
-  if (score >= 25) return { label: 'Alpha',      color: 'text-yellow-700 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/30' };
-  return              { label: 'Incubating', color: 'text-gray-500 dark:text-gray-400',     bg: 'bg-gray-100 dark:bg-gray-700' };
+  if (score >= 75) return { label: 'Mature', color: 'text-green-700 dark:text-green-400', bg: 'bg-green-50 dark:bg-green-900/30' };
+  if (score >= 50) return { label: 'Beta', color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-900/30' };
+  if (score >= 25) return { label: 'Alpha', color: 'text-yellow-700 dark:text-yellow-400', bg: 'bg-yellow-50 dark:bg-yellow-900/30' };
+  return { label: 'Incubating', color: 'text-gray-500 dark:text-gray-400', bg: 'bg-gray-100 dark:bg-gray-700' };
 }
 
 /* ------------------------------------------------------------------ */
@@ -398,8 +398,8 @@ function applyFilters() {
   let repos = [...allRepos];
 
   // Type filter
-  if (currentFilter === 'fork')     repos = repos.filter(r => r.fork);
-  else if (currentFilter === 'source')   repos = repos.filter(r => !r.fork && !r.archived);
+  if (currentFilter === 'fork') repos = repos.filter(r => r.fork);
+  else if (currentFilter === 'source') repos = repos.filter(r => !r.fork && !r.archived);
   else if (currentFilter === 'archived') repos = repos.filter(r => r.archived);
 
   // Language filter
@@ -441,14 +441,14 @@ function applyFilters() {
 /*  RENDER REPOS (dispatches to table or card view)                    */
 /* ------------------------------------------------------------------ */
 function renderRepos(repos) {
-  const grid  = document.getElementById('repo-grid');
+  const grid = document.getElementById('repo-grid');
   const table = document.getElementById('repo-table');
   const empty = document.getElementById('empty-state');
 
   if (!grid || !table || !empty) return;
 
   if (repos.length === 0) {
-    grid.innerHTML  = '';
+    grid.innerHTML = '';
     table.innerHTML = '';
     empty.classList.remove('hidden');
     return;
@@ -478,7 +478,7 @@ function renderRepos(repos) {
     grid.innerHTML = repos.map(repo => repoCardHTML(repo)).join('');
     // Attach error handlers for screenshot images to show placeholder on load failure
     grid.querySelectorAll('img[data-screenshot-placeholder]').forEach(img => {
-      img.addEventListener('error', function() {
+      img.addEventListener('error', function () {
         const link = this.closest('.card-screenshot-link');
         if (!link) return;
         const placeholder = document.createElement('div');
@@ -683,9 +683,9 @@ function repoCardHTML(r) {
         <i class="fa-brands fa-github mr-1.5" aria-hidden="true"></i>View Repo
       </a>
       ${r.homepage ? (() => {
-        let isGithubPages = false;
-        try { const h = new URL(r.homepage).hostname; isGithubPages = h === 'github.io' || h.endsWith('.github.io'); } catch (e) { /* invalid URL */ }
-        return `
+      let isGithubPages = false;
+      try { const h = new URL(r.homepage).hostname; isGithubPages = h === 'github.io' || h.endsWith('.github.io'); } catch (e) { /* invalid URL */ }
+      return `
         <a
           href="${escapeHtml(r.homepage)}"
           target="_blank"
@@ -696,7 +696,7 @@ function repoCardHTML(r) {
           <i class="${isGithubPages ? 'fa-brands fa-github' : 'fa-solid fa-globe'} mr-1.5" aria-hidden="true"></i>${isGithubPages ? 'GitHub Pages' : 'Live Site'}
         </a>
       `;
-      })() : `
+    })() : `
         <span
           role="button"
           aria-disabled="true"
@@ -756,34 +756,34 @@ function repoCardHTML(r) {
 /*  RENDER TABLE VIEW                                                   */
 /* ------------------------------------------------------------------ */
 const TABLE_COLS = [
-  { key: 'name',              label: 'Repository' },
-  { key: 'topics',            label: 'Labels'     },
-  { key: 'language',          label: 'Language'   },
-  { key: 'stargazers_count',  label: 'Stars'      },
-  { key: 'forks_count',       label: 'Forks'      },
-  { key: 'open_issues_count', label: 'Issues'     },
-  { key: 'open_pr_count',     label: 'PRs'        },
-  { key: 'agent_pr_count',    label: 'Agent PRs'  },
-  { key: 'total_commits',     label: 'Commits'    },
-  { key: 'branch_count',      label: 'Branches'   },
-  { key: 'size',              label: 'Size'       },
-  { key: 'readme_chars',      label: 'README Size' },
-  { key: 'maturity',          label: 'Maturity'   },
-  { key: 'latest_release',    label: 'Release'    },
-  { key: 'latest_commit',     label: 'Last Commit' },
-  { key: 'latest_pr',        label: 'Last PR'    },
-  { key: 'updated_at',        label: 'Updated'    },
-  { key: 'latest_issue',      label: 'Latest Issue' },
-  { key: 'infra',             label: 'Infra'        },
+  { key: 'name', label: 'Repository' },
+  { key: 'topics', label: 'Labels' },
+  { key: 'language', label: 'Language' },
+  { key: 'stargazers_count', label: 'Stars' },
+  { key: 'forks_count', label: 'Forks' },
+  { key: 'open_issues_count', label: 'Issues' },
+  { key: 'open_pr_count', label: 'PRs' },
+  { key: 'agent_pr_count', label: 'Agent PRs' },
+  { key: 'total_commits', label: 'Commits' },
+  { key: 'branch_count', label: 'Branches' },
+  { key: 'size', label: 'Size' },
+  { key: 'readme_chars', label: 'README Size' },
+  { key: 'maturity', label: 'Maturity' },
+  { key: 'latest_release', label: 'Release' },
+  { key: 'latest_commit', label: 'Last Commit' },
+  { key: 'latest_pr', label: 'Last PR' },
+  { key: 'updated_at', label: 'Updated' },
+  { key: 'latest_issue', label: 'Latest Issue' },
+  { key: 'infra', label: 'Infra' },
 ];
 
 function renderTableView(repos, container) {
   // Sort repos by current table sort state
   const sorted = [...repos].sort((a, b) => {
     let v;
-    if (tableSortCol === 'name')       v = a.name.localeCompare(b.name);
+    if (tableSortCol === 'name') v = a.name.localeCompare(b.name);
     else if (tableSortCol === 'updated_at') v = new Date(a.updated_at) - new Date(b.updated_at);
-    else if (tableSortCol === 'maturity')   v = maturityScore(a) - maturityScore(b);
+    else if (tableSortCol === 'maturity') v = maturityScore(a) - maturityScore(b);
     else if (tableSortCol === 'open_issues_count') v = repoIssueCount(a) - repoIssueCount(b);
     else if (tableSortCol === 'topics') v = (a.topics || []).length - (b.topics || []).length;
     else if (tableSortCol === 'latest_release') {
@@ -819,18 +819,18 @@ function renderTableView(repos, container) {
 
   // Compute column totals for headers
   const colTotals = {
-    name:               repos.length,
-    stargazers_count:   repos.reduce((s, r) => s + (r.stargazers_count || 0), 0),
-    forks_count:        repos.reduce((s, r) => s + (r.forks_count || 0), 0),
-    open_issues_count:  repos.reduce((s, r) => s + repoIssueCount(r), 0),
-    open_pr_count:      repos.reduce((s, r) => s + (r.open_pr_count || 0), 0),
-    agent_pr_count:     repos.reduce((s, r) => s + (r.agent_pr_count || 0), 0),
-    total_commits:      repos.reduce((s, r) => s + (r.total_commits || 0), 0),
-    branch_count:       repos.reduce((s, r) => s + (r.branch_count || 0), 0),
-    size:               repos.reduce((s, r) => s + (r.size || 0), 0),
-    readme_chars:       repos.reduce((s, r) => s + (r.readme_chars || 0), 0),
-    language:           new Set(repos.map(r => r.language).filter(Boolean)).size,
-    topics:             new Set(repos.flatMap(r => r.topics || [])).size,
+    name: repos.length,
+    stargazers_count: repos.reduce((s, r) => s + (r.stargazers_count || 0), 0),
+    forks_count: repos.reduce((s, r) => s + (r.forks_count || 0), 0),
+    open_issues_count: repos.reduce((s, r) => s + repoIssueCount(r), 0),
+    open_pr_count: repos.reduce((s, r) => s + (r.open_pr_count || 0), 0),
+    agent_pr_count: repos.reduce((s, r) => s + (r.agent_pr_count || 0), 0),
+    total_commits: repos.reduce((s, r) => s + (r.total_commits || 0), 0),
+    branch_count: repos.reduce((s, r) => s + (r.branch_count || 0), 0),
+    size: repos.reduce((s, r) => s + (r.size || 0), 0),
+    readme_chars: repos.reduce((s, r) => s + (r.readme_chars || 0), 0),
+    language: new Set(repos.map(r => r.language).filter(Boolean)).size,
+    topics: new Set(repos.flatMap(r => r.topics || [])).size,
   };
 
   // Build header cells
@@ -882,8 +882,8 @@ function renderTableView(repos, container) {
       </td>
       <td class="px-3 py-2 whitespace-nowrap text-sm">
         ${r.language
-          ? `<span class="lang-dot" style="background:${langColor}"></span><span class="text-gray-600 dark:text-gray-300">${escapeHtml(r.language)}</span>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<span class="lang-dot" style="background:${langColor}"></span><span class="text-gray-600 dark:text-gray-300">${escapeHtml(r.language)}</span>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-right whitespace-nowrap text-sm tabular-nums">
         <a href="${escapeHtml(r.html_url)}/stargazers" target="_blank" rel="noopener noreferrer" class="hover:text-yellow-500 transition-colors" title="Stars">
@@ -902,23 +902,23 @@ function renderTableView(repos, container) {
       </td>
       <td class="px-3 py-2 text-right whitespace-nowrap text-sm tabular-nums">
         ${r.open_pr_count
-          ? `<a href="${escapeHtml(r.html_url)}/pulls" target="_blank" rel="noopener noreferrer" class="hover:text-teal-500 transition-colors" title="Open pull requests"><i class="fa-solid fa-code-pull-request text-teal-500 mr-1" aria-hidden="true"></i>${formatNumber(r.open_pr_count)}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.html_url)}/pulls" target="_blank" rel="noopener noreferrer" class="hover:text-teal-500 transition-colors" title="Open pull requests"><i class="fa-solid fa-code-pull-request text-teal-500 mr-1" aria-hidden="true"></i>${formatNumber(r.open_pr_count)}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-right whitespace-nowrap text-sm tabular-nums">
         ${r.agent_pr_count
-          ? `<a href="${escapeHtml(r.html_url)}/pulls" target="_blank" rel="noopener noreferrer" class="hover:text-purple-500 transition-colors" title="Open agent pull requests"><i class="fa-solid fa-robot text-purple-500 mr-1" aria-hidden="true"></i>${formatNumber(r.agent_pr_count)}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.html_url)}/pulls" target="_blank" rel="noopener noreferrer" class="hover:text-purple-500 transition-colors" title="Open agent pull requests"><i class="fa-solid fa-robot text-purple-500 mr-1" aria-hidden="true"></i>${formatNumber(r.agent_pr_count)}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-right whitespace-nowrap text-sm tabular-nums">
         ${r.total_commits
-          ? `<a href="${escapeHtml(r.html_url)}/commits" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 transition-colors" title="Total commits"><i class="fa-solid fa-code-commit text-blue-400 mr-1" aria-hidden="true"></i>${formatNumber(r.total_commits)}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.html_url)}/commits" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 transition-colors" title="Total commits"><i class="fa-solid fa-code-commit text-blue-400 mr-1" aria-hidden="true"></i>${formatNumber(r.total_commits)}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-right whitespace-nowrap text-sm tabular-nums">
         ${r.branch_count
-          ? `<a href="${escapeHtml(r.html_url)}/branches" target="_blank" rel="noopener noreferrer" class="hover:text-violet-500 transition-colors" title="Branches"><i class="fa-solid fa-code-branch text-violet-400 mr-1" aria-hidden="true"></i>${formatNumber(r.branch_count)}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.html_url)}/branches" target="_blank" rel="noopener noreferrer" class="hover:text-violet-500 transition-colors" title="Branches"><i class="fa-solid fa-code-branch text-violet-400 mr-1" aria-hidden="true"></i>${formatNumber(r.branch_count)}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-right whitespace-nowrap text-sm tabular-nums">
         <i class="fa-solid fa-database text-cyan-400 mr-1" aria-hidden="true"></i>${formatSize(r.size)}
@@ -931,30 +931,30 @@ function renderTableView(repos, container) {
       </td>
       <td class="px-3 py-2 whitespace-nowrap text-xs">
         ${r.latest_release
-          ? `<a href="${escapeHtml(r.latest_release.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-green-600 transition-colors text-gray-600 dark:text-gray-300" title="Latest release${r.latest_release.published_at ? ': ' + r.latest_release.published_at : ''}"><i class="fa-solid fa-tag text-green-500 mr-1" aria-hidden="true"></i>${escapeHtml(r.latest_release.tag_name)}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.latest_release.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-green-600 transition-colors text-gray-600 dark:text-gray-300" title="Latest release${r.latest_release.published_at ? ': ' + r.latest_release.published_at : ''}"><i class="fa-solid fa-tag text-green-500 mr-1" aria-hidden="true"></i>${escapeHtml(r.latest_release.tag_name)}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-xs max-w-[16rem]">
         ${r.latest_commit
-          ? `<a href="${escapeHtml(r.latest_commit.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline transition-colors text-gray-600 dark:text-gray-300 truncate block" title="${escapeHtml(r.latest_commit.message)}${r.latest_commit.author ? ' by ' + escapeHtml(r.latest_commit.author) : ''}"><i class="fa-solid fa-code-commit text-blue-400 mr-1" aria-hidden="true"></i>${r.latest_commit.author_avatar ? `<img src="${escapeHtml(r.latest_commit.author_avatar)}&amp;s=20" alt="${escapeHtml(r.latest_commit.author)}" title="${escapeHtml(r.latest_commit.author)}" class="inline-block w-4 h-4 rounded-full mr-1 align-middle" loading="lazy" />` : ''}${escapeHtml(r.latest_commit.message)}${r.latest_commit.author ? `<span class="ml-1 text-gray-400 dark:text-gray-500">by ${escapeHtml(r.latest_commit.author)}</span>` : ''}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.latest_commit.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline transition-colors text-gray-600 dark:text-gray-300 truncate block" title="${escapeHtml(r.latest_commit.message)}${r.latest_commit.author ? ' by ' + escapeHtml(r.latest_commit.author) : ''}"><i class="fa-solid fa-code-commit text-blue-400 mr-1" aria-hidden="true"></i>${r.latest_commit.author_avatar ? `<img src="${escapeHtml(r.latest_commit.author_avatar)}&amp;s=20" alt="${escapeHtml(r.latest_commit.author)}" title="${escapeHtml(r.latest_commit.author)}" class="inline-block w-4 h-4 rounded-full mr-1 align-middle" loading="lazy" />` : ''}${escapeHtml(r.latest_commit.message)}${r.latest_commit.author ? `<span class="ml-1 text-gray-400 dark:text-gray-500">by ${escapeHtml(r.latest_commit.author)}</span>` : ''}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 text-xs max-w-[16rem]">
         ${r.latest_pr ? (() => {
-          const prState = r.latest_pr.state;
-          const prIcon = prState === 'merged'
-            ? `<i class="fa-solid fa-code-merge text-purple-500 mr-1" aria-hidden="true" title="Merged"></i>`
-            : prState === 'open'
-              ? `<i class="fa-solid fa-code-pull-request text-green-500 mr-1" aria-hidden="true" title="Open"></i>`
-              : `<i class="fa-solid fa-circle-xmark text-red-500 mr-1" aria-hidden="true" title="Closed"></i>`;
-          return `<a href="${escapeHtml(r.latest_pr.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline transition-colors text-gray-600 dark:text-gray-300 truncate block" title="#${r.latest_pr.number}: ${escapeHtml(r.latest_pr.title)}${r.latest_pr.author ? ' by ' + escapeHtml(r.latest_pr.author) : ''} [${prState}]">${prIcon}${r.latest_pr.author_avatar ? `<img src="${escapeHtml(r.latest_pr.author_avatar)}&amp;s=20" alt="${escapeHtml(r.latest_pr.author)}" title="${escapeHtml(r.latest_pr.author)}" class="inline-block w-4 h-4 rounded-full mr-1 align-middle" loading="lazy" />` : ''}#${r.latest_pr.number}: ${escapeHtml(r.latest_pr.title)}${r.latest_pr.author ? `<span class="ml-1 text-gray-400 dark:text-gray-500">by ${escapeHtml(r.latest_pr.author)}</span>` : ''}</a>`;
-        })() : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        const prState = r.latest_pr.state;
+        const prIcon = prState === 'merged'
+          ? `<i class="fa-solid fa-code-merge text-purple-500 mr-1" aria-hidden="true" title="Merged"></i>`
+          : prState === 'open'
+            ? `<i class="fa-solid fa-code-pull-request text-green-500 mr-1" aria-hidden="true" title="Open"></i>`
+            : `<i class="fa-solid fa-circle-xmark text-red-500 mr-1" aria-hidden="true" title="Closed"></i>`;
+        return `<a href="${escapeHtml(r.latest_pr.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-blue-500 hover:underline transition-colors text-gray-600 dark:text-gray-300 truncate block" title="#${r.latest_pr.number}: ${escapeHtml(r.latest_pr.title)}${r.latest_pr.author ? ' by ' + escapeHtml(r.latest_pr.author) : ''} [${prState}]">${prIcon}${r.latest_pr.author_avatar ? `<img src="${escapeHtml(r.latest_pr.author_avatar)}&amp;s=20" alt="${escapeHtml(r.latest_pr.author)}" title="${escapeHtml(r.latest_pr.author)}" class="inline-block w-4 h-4 rounded-full mr-1 align-middle" loading="lazy" />` : ''}#${r.latest_pr.number}: ${escapeHtml(r.latest_pr.title)}${r.latest_pr.author ? `<span class="ml-1 text-gray-400 dark:text-gray-500">by ${escapeHtml(r.latest_pr.author)}</span>` : ''}</a>`;
+      })() : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 whitespace-nowrap text-xs text-gray-500 dark:text-gray-400" title="Last updated: ${escapeHtml(r.updated_at)}">${timeAgo(r.updated_at)}</td>
       <td class="px-3 py-2 text-xs max-w-[14rem]">
         ${r.latest_issue
-          ? `<a href="${escapeHtml(r.latest_issue.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-brand hover:underline transition-colors text-gray-600 dark:text-gray-300 truncate block" title="#${r.latest_issue.number}: ${escapeHtml(r.latest_issue.title)}"><i class="fa-solid fa-circle-dot text-brand mr-1" aria-hidden="true"></i>#${r.latest_issue.number}: ${escapeHtml(r.latest_issue.title)}</a>`
-          : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
+        ? `<a href="${escapeHtml(r.latest_issue.html_url)}" target="_blank" rel="noopener noreferrer" class="hover:text-brand hover:underline transition-colors text-gray-600 dark:text-gray-300 truncate block" title="#${r.latest_issue.number}: ${escapeHtml(r.latest_issue.title)}"><i class="fa-solid fa-circle-dot text-brand mr-1" aria-hidden="true"></i>#${r.latest_issue.number}: ${escapeHtml(r.latest_issue.title)}</a>`
+        : `<span class="text-gray-300 dark:text-gray-600">—</span>`}
       </td>
       <td class="px-3 py-2 whitespace-nowrap text-center">
         <div class="flex items-center justify-center gap-1.5">
@@ -1133,7 +1133,7 @@ on('retry-btn', 'click', () => {
     <div class="skeleton h-48 rounded-xl"></div>
     <div class="skeleton h-48 rounded-xl"></div>
   `;
-  
+
   loadRepos();
 });
 
@@ -1196,3 +1196,27 @@ async function refreshStatsInBackground() {
   }
 }
 loadRepos();
+document.addEventListener('DOMContentLoaded', () => {
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      refreshBtn.disabled = true;
+      const originalHTML = refreshBtn.innerHTML;
+      refreshBtn.innerHTML = '<i class="fa-solid fa-rotate-right mr-1 animate-spin"></i>Refreshing...';
+
+      try {
+        await refreshStatsInBackground();
+
+        refreshBtn.innerHTML = '<i class="fa-solid fa-check mr-1"></i>Updated!';
+        setTimeout(() => {
+          refreshBtn.disabled = false;
+          refreshBtn.innerHTML = originalHTML;
+        }, 2000);
+      } catch (err) {
+        console.error("Manual refresh failed:", err);
+        refreshBtn.innerHTML = '<i class="fa-solid fa-xmark mr-1"></i>Failed';
+        refreshBtn.disabled = false;
+      }
+    });
+  }
+});
